@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dự án STEM</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+.process-container{
+display:grid;
+grid-template-columns: 1fr 420px;
+gap:40px;
+align-items:start;
+margin-top:40px;
+}
+
+.process{
+flex:1;
+}
+
+.video-box{
+background:white;
+padding:20px;
+border-radius:16px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+text-align:center;
+}
+
+.video-box iframe{
+width:100%;
+height:320px;
+border-radius:12px;
+}
+
+.video-caption{
+margin-top:10px;
+font-size:18px;
+color:#444;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+
+font-family:'Be Vietnam Pro',sans-serif;
+
+background:url("flower-bg.png");
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
+
+}
+
+/* overlay */
+
+.overlay{
+
+min-height:100vh;
+
+background:linear-gradient(
+rgba(255,255,255,0.55),
+rgba(255,255,255,0.45)
+);
+
+backdrop-filter:blur(6px);
+
+}
+
+/* header */
+
+.header{
+
+background:rgba(231,198,183,0.9);
+
+padding:25px;
+
+text-align:center;
+
+font-family:'Playfair Display',serif;
+
+font-size:34px;
+
+box-shadow:0 6px 20px rgba(0,0,0,0.1);
+
+}
+
+/* subtitle */
+
+.subtitle{
+
+text-align:center;
+
+font-size:18px;
+
+padding:10px;
+
+color:#444;
+
+}
+
+/* product section */
+
+.products{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+
+gap:60px;
+
+max-width:900px;
+
+margin:120px auto;
+
+}
+
+/* product card */
+
+.product{
+
+text-align:center;
+
+cursor:pointer;
+
+padding:25px;
+
+border-radius:22px;
+
+background:rgba(255,255,255,0.6);
+
+backdrop-filter:blur(12px);
+
+box-shadow:0 15px 35px rgba(0,0,0,0.15);
+
+transition:0.35s;
+
+border:2px solid rgba(255,255,255,0.4);
+
+}
+
+.product:hover{
+
+transform:translateY(-10px) scale(1.05);
+
+box-shadow:0 20px 45px rgba(0,0,0,0.25);
+
+}
+
+.product img{
+
+width:230px;
+
+border-radius:18px;
+
+margin-bottom:12px;
+
+}
+
+.product p{
+
+font-size:18px;
+
+color:#333;
+
+}
+
+/* section text */
+
+.section{
+
+max-width:900px;
+
+margin:100px auto;
+
+font-size:18px;
+
+line-height:1.8;
+
+color:#333;
+
+padding:0 20px;
+
+}
+
+.section h2{
+
+font-family:'Playfair Display',serif;
+
+margin-bottom:20px;
+
+font-size:28px;
+
+}
+
+/* process grid */
+
+.process{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+gap:40px;
+
+margin-top:40px;
+
+}
+
+.step{
+
+background:rgba(255,255,255,0.7);
+
+padding:20px;
+
+border-radius:18px;
+
+box-shadow:0 8px 20px rgba(0,0,0,0.15);
+
+}
+
+.step h3{
+
+margin-bottom:10px;
+
+}
+
+/* popup */
+
+.popup{
+
+display:none;
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+background:rgba(0,0,0,0.65);
+
+justify-content:center;
+
+align-items:center;
+
+}
+
+.popup-content{
+
+background:rgba(255,255,255,0.95);
+
+padding:35px;
+
+border-radius:20px;
+
+width:60%;
+
+max-width:650px;
+
+font-size:18px;
+
+line-height:1.7;
+
+box-shadow:0 25px 60px rgba(0,0,0,0.35);
+
+}
+
+.close{
+
+float:right;
+
+font-size:26px;
+
+cursor:pointer;
+
+}
+
+.popup img{
+
+width:220px;
+
+margin:10px;
+
+border-radius:12px;
+
+box-shadow:0 6px 18px rgba(0,0,0,0.2);
+
+}
+
+/* footer */
+
+.footer{
+
+margin-top:140px;
+
+background:rgba(231,198,183,0.9);
+
+text-align:center;
+
+padding:22px;
+
+font-size:16px;
+
+line-height:1.6;
+
+box-shadow:0 -6px 20px rgba(0,0,0,0.1);
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="overlay">
+
+<div class="header">
+BỘ SẢN PHẨM CHĂM SÓC HỌC ĐƯỜNG TỪ NGUYÊN LIỆU TỰ NHIÊN
+</div>
+
+<div class="subtitle">
+Dự án STEM – Thiết kế bộ sản phẩm chăm sóc học đường từ nguyên liệu tự nhiên
+</div>
+
+<!-- sản phẩm -->
+
+<div class="products">
+
+<div class="product" onclick="openPopup('gel')">
+
+<img src="gel.jpg">
+
+<p><b>Gel rửa tay sát khuẩn thảo mộc</b></p>
+
+</div>
+
+<div class="product" onclick="openPopup('soap')">
+
+<img src="soap.jpg">
+
+<p><b>Xà bông nghệ mộc</b></p>
+
+</div>
+
+</div>
+
+
+<!-- GIỚI THIỆU -->
+
+<div class="section">
+
+<h2>Giới thiệu dự án</h2>
+
+<p>
+
+Dự án STEM “Bộ sản phẩm chăm sóc học đường từ nguyên liệu tự nhiên”
+được thực hiện với mục tiêu nghiên cứu và tạo ra các sản phẩm
+chăm sóc cá nhân an toàn, thân thiện với môi trường và phù hợp
+với học sinh.
+
+</p>
+
+<p>
+
+Nhóm đã vận dụng kiến thức liên môn như hóa học,
+sinh học và công nghệ để phát triển các sản phẩm
+có nguồn gốc từ nguyên liệu tự nhiên.
+
+</p>
+
+</div>
+
+
+<!-- QUY TRÌNH -->
+
+<div class="section">
+
+<h2>Quy trình thực hiện</h2>
+
+<div class="process-container">
+
+<div class="process">
+
+<div class="step">
+<h3>1. Nghiên cứu công thức</h3>
+<p>
+Tìm hiểu tài liệu về các sản phẩm chăm sóc da,
+phân tích thành phần và lựa chọn công thức
+phù hợp với mục tiêu của dự án.
+</p>
+</div>
+
+<div class="step">
+<h3>2. Chuẩn bị nguyên liệu</h3>
+<p>
+Chuẩn bị các nguyên liệu như ethanol,
+dầu dừa, glycerin, tinh dầu thiên nhiên
+và các dụng cụ cần thiết cho quá trình thực nghiệm.
+</p>
+</div>
+
+<div class="step">
+<h3>3. Tiến hành thực nghiệm</h3>
+<p>
+Tiến hành pha chế gel rửa tay và xà bông nghệ
+theo đúng tỉ lệ công thức và quy trình
+để đảm bảo chất lượng sản phẩm.
+</p>
+</div>
+
+<div class="step">
+<h3>4. Kiểm tra chất lượng</h3>
+<p>
+Sử dụng giấy quỳ để kiểm tra độ pH
+của sản phẩm nhằm đảm bảo an toàn
+khi sử dụng trên da.
+</p>
+</div>
+
+</div>
+
+<!-- VIDEO -->
+
+<div class="video-box">
+
+<iframe
+width="560" 
+height="315"
+src="https://www.youtube-nocookie.com/embed/40jNvrZDnJE"
+title="Video quy trình thực hiện"
+frameborder="0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+allowfullscreen>
+</iframe>
+
+<p class="video-title">
+🎥 Video hướng dẫn thực hiện
+</p>
+
+</div>
+
+</div>
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- POPUP GEL -->
+
+<div id="gel" class="popup">
+
+<div class="popup-content">
+
+<span class="close" onclick="closePopup('gel')">✕</span>
+
+<h2>Gel rửa tay sát khuẩn thảo mộc</h2>
+
+<b>Thành phần:</b>
+
+<ul>
+
+<li>Ethanol: 72–75%</li>
+
+<li>Glycerin: 1.5%</li>
+
+<li>Carbomer: 0.3%</li>
+
+<li>Hydrogen peroxide: 0.5%</li>
+
+<li>Tinh dầu: sả, bưởi, húng lủi</li>
+
+<li>Nước cất: vừa đủ</li>
+
+</ul>
+
+<p>
+Lan tỏa hương sả bưởi thanh mát,
+giúp làm sạch tay và mang lại cảm giác dễ chịu.
+</p>
+
+<h3>Kiểm định pH</h3>
+
+<img src="ph_gel.jpg">
+
+</div>
+
+</div>
+
+
+<!-- POPUP SOAP -->
+
+<div id="soap" class="popup">
+
+<div class="popup-content">
+
+<span class="close" onclick="closePopup('soap')">✕</span>
+
+<h2>Xà bông nghệ mộc</h2>
+
+<b>Thành phần:</b>
+
+<ul>
+
+<li>Dầu dừa: 68.9%</li>
+
+<li>Nước cất: 20.7%</li>
+
+<li>NaOH: 9.8%</li>
+
+<li>Tinh bột nghệ: 0.66%</li>
+
+</ul>
+
+<p>
+
+Công thức từ nghệ thiên nhiên giúp làm sạch da nhẹ nhàng
+và hỗ trợ làm dịu vùng da nhạy cảm.
+
+</p>
+
+<h3>Kiểm định pH</h3>
+
+<img src="ph_soap.jpg">
+
+</div>
+
+</div>
+
+
+<div class="footer">
+
+Dự án STEM – Nhóm EchoOverEgo  
+<br>
+Lớp 11A16 – Trường THPT Phú Nhuận  
+<br>
+Năm học 2025 – 2026
+
+</div>
+
+</div>
+
+
+<script>
+
+function openPopup(id){
+document.getElementById(id).style.display="flex"
+}
+
+function closePopup(id){
+document.getElementById(id).style.display="none"
+}
+
+</script>
+
+</body>
+</html>

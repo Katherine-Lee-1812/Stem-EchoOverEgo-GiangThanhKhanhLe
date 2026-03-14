@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -11,6 +10,45 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
+
+    /* ICON GÓC PHẢI */
+
+#scannerBtn{
+position:fixed;
+top:20px;
+right:20px;
+font-size:32px;
+background:white;
+border-radius:50%;
+padding:12px;
+cursor:pointer;
+box-shadow:0 4px 10px rgba(0,0,0,0.25);
+z-index:999;
+}
+
+
+/* POPUP */
+
+#scannerPopup{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:20px;
+border-radius:15px;
+display:none;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+width:420px;
+text-align:center;
+z-index:1000;
+}
+
+#canvasOutput{
+max-width:100%;
+margin-top:10px;
+}
+
 
 .process-container{
 display:grid;
@@ -570,5 +608,124 @@ document.getElementById(id).style.display="none"
 
 </script>
 
+<script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+<!-- ICON MỞ MÁY QUÉT -->
+<div id="scannerBtn">🔬</div>
+<!-- POPUP SCANNER -->
+<div id="scannerPopup">
+
+<h2>Colony Scanner</h2>
+
+<input type="file" id="imageInput" accept="image/*">
+
+<br><br>
+
+<canvas id="canvasOutput"></canvas>
+
+<div class="resultBox">
+<p>Tổng vi khuẩn: <span id="total">0</span></p>
+<p>E.coli: <span id="ecoli">0</span></p>
+<p>Coliform: <span id="coliform">0</span></p>
+</div>
+
+<br>
+<button onclick="closeScanner()">Đóng</button>
+
+</div>
+
+<script>
+
+/* MỞ SCANNER */
+
+document.getElementById("scannerBtn").onclick=function(){
+document.getElementById("scannerPopup").style.display="block";
+}
+
+
+/* ĐÓNG SCANNER */
+
+function closeScanner(){
+document.getElementById("scannerPopup").style.display="none";
+}
+
+</script>
+
+<script>
+
+document.getElementById('imageInput').addEventListener('change',function(e){
+
+let img=new Image();
+
+img.onload=function(){
+
+let canvas=document.getElementById("canvasOutput");
+let ctx=canvas.getContext("2d");
+
+canvas.width=img.width;
+canvas.height=img.height;
+
+ctx.drawImage(img,0,0);
+
+detectColonies(canvas);
+
+}
+
+img.src=URL.createObjectURL(e.target.files[0]);
+
+});
+
+
+function detectColonies(canvas){
+
+let src=cv.imread(canvas);
+let hsv=new cv.Mat();
+
+cv.cvtColor(src,hsv,cv.COLOR_RGB2HSV);
+
+
+/* TẠO MASK MÀU */
+
+let ecoliMask=new cv.Mat();
+let coliformMask=new cv.Mat();
+
+
+/* MÀU XANH (E.COLI) */
+
+let lowerBlue=new cv.Mat(hsv.rows,hsv.cols,hsv.type(),[90,50,50,0]);
+let upperBlue=new cv.Mat(hsv.rows,hsv.cols,hsv.type(),[130,255,255,255]);
+
+
+/* MÀU ĐỎ (COLIFORM) */
+
+let lowerRed=new cv.Mat(hsv.rows,hsv.cols,hsv.type(),[0,70,50,0]);
+let upperRed=new cv.Mat(hsv.rows,hsv.cols,hsv.type(),[10,255,255,255]);
+
+
+cv.inRange(hsv,lowerBlue,upperBlue,ecoliMask);
+cv.inRange(hsv,lowerRed,upperRed,coliformMask);
+
+
+/* TÌM KHUẨN LẠC */
+
+let ecoliContours=new cv.MatVector();
+let colContours=new cv.MatVector();
+
+cv.findContours(ecoliMask,ecoliContours,new cv.Mat(),cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
+cv.findContours(coliformMask,colContours,new cv.Mat(),cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
+
+
+let ecoliCount=ecoliContours.size();
+let colCount=colContours.size();
+
+
+/* HIỂN THỊ KẾT QUẢ */
+
+document.getElementById("ecoli").innerText=ecoliCount;
+document.getElementById("coliform").innerText=colCount;
+document.getElementById("total").innerText=ecoliCount+colCount;
+
+}
+
+</script>
 </body>
 </html>

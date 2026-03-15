@@ -46,9 +46,7 @@ z-index:1000;
 
 #canvasOutput{
 max-width:100%;
-height:auto;
-display:block;
-margin:auto;
+margin-top:10px;
 }
 
 
@@ -668,72 +666,7 @@ canvas.height=img.height;
 
 ctx.drawImage(img,0,0);
 
-async function detectColonies(canvas) {
-    let src = cv.imread(canvas);
-    
-    // 1. CHUẨN HÓA KÍCH THƯỚC (QUAN TRỌNG NHẤT)
-    // Đưa ảnh về chiều rộng 800px để các tham số area hoạt động ổn định
-    let dsize = new cv.Size(800, src.rows * 800 / src.cols);
-    cv.resize(src, src, dsize, 0, 0, cv.INTER_AREA);
-
-    let hsv = new cv.Mat();
-    cv.cvtColor(src, hsv, cv.COLOR_RGBA2RGB);
-    cv.cvtColor(hsv, hsv, cv.COLOR_RGB2HSV);
-
-    // 2. TĂNG CƯỜNG ĐỘ TƯƠNG PHẢN (Để tách khuẩn lạc khỏi nền đục)
-    let channels = new cv.MatVector();
-    cv.split(hsv, channels);
-    let v = channels.get(2); // Kênh Value (độ sáng)
-    cv.equalizeHist(v, v); // Cân bằng sáng
-    cv.merge(channels, hsv);
-
-    // 3. NGƯỠNG MÀU TINH CHỈNH (E.coli xanh dương, Coliform đỏ)
-    let ecoliMask = new cv.Mat();
-    let coliformMask = new cv.Mat();
-
-    // Blue (E.coli): Nới rộng dải S và V để bắt khuẩn lạc nhạt màu
-    cv.inRange(hsv, new cv.Scalar(90, 40, 40), new cv.Scalar(140, 255, 255), ecoliMask);
-
-    // Red (Coliform): Dải đỏ kép
-    let r1 = new cv.Mat(), r2 = new cv.Mat();
-    cv.inRange(hsv, new cv.Scalar(0, 40, 40), new cv.Scalar(15, 255, 255), r1);
-    cv.inRange(hsv, new cv.Scalar(160, 40, 40), new cv.Scalar(180, 255, 255), r2);
-    cv.add(r1, r2, coliformMask);
-
-    // 4. XỬ LÝ HÌNH THÁI HỌC MẠNH HƠN
-    // Dùng kernel 5x5 để tách các khuẩn lạc dính nhau tốt hơn
-    let M = cv.getStructuringElement(cv.MORPH_ELLIPSE, new cv.Size(5, 5));
-    cv.morphologyEx(ecoliMask, ecoliMask, cv.MORPH_OPEN, M);
-    cv.morphologyEx(coliformMask, coliformMask, cv.MORPH_OPEN, M);
-
-    // 5. HÀM ĐẾM VỚI BỘ LỌC HÌNH DẠNG (Circular Filter)
-    function countColonies(mask) {
-        let contours = new cv.MatVector();
-        let hierarchy = new cv.Mat();
-        cv.findContours(mask, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-        
-        let count = 0;
-        for (let i = 0; i < contours.size(); ++i) {
-<script>
-
-document.getElementById('imageInput').addEventListener('change',function(e){
-
-let img=new Image();
-
-img.onload=function(){
-
-let canvas=document.getElementById("canvasOutput");
-let ctx=canvas.getContext("2d");
-
-canvas.width=img.width;
-canvas.height=img.height;
-
-ctx.drawImage(img,0,0);
-
-// đảm bảo OpenCV đã load
-if (typeof cv !== "undefined") {
 detectColonies(canvas);
-}
 
 }
 
@@ -742,212 +675,56 @@ img.src=URL.createObjectURL(e.target.files[0]);
 });
 
 
-
 function detectColonies(canvas){
 
 let src=cv.imread(canvas);
-
-// chuẩn hóa kích thước
-let dsize=new cv.Size(800,src.rows*800/src.cols);
-cv.resize(src,src,dsize,0,0,cv.INTER_AREA);
-
-
-// chuyển HSV
-let hsv=new cv.Mat();
-cv.cvtColor(src,hsv,cv.COLOR_RGBA2RGB);
-cv.cvtColor(hsv,hsv,cv.COLOR_RGB2HSV);
-
-
-// tăng tương phản
-let channels=new cv.MatVector();
-cv.split(hsv,channels);
-
-let v=channels.get(2);
-cv.equalizeHist(v,v);
-
-cv.merge(channels,hsv);
-
-
-// mask ecoli
-let ecoliMask=new cv.Mat();
-cv.inRange(
-hsv,
-new cv.Scalar(90,40,40),
-new cv.Scalar(140,255,255),
-ecoliMask
-);
-
-
-// mask coliform
-let coliformMask=new cv.Mat();
-
-let r1=new cv.Mat();
-let r2=new cv.Mat();
-
-cv.inRange(hsv,new cv.Scalar(0,40,40),new cv.Scalar(15,255,255),r1);
-cv.inRange(hsv,new cv.Scalar(160,40,40),new cv.Scalar(180,255,255),r2);
-
-
-<script>
-
-document.getElementById("imageInput").addEventListener("change",function(e){
-
-let file=e.target.files[0];
-
-if(!file) return;
-
-let img=new Image();
-
-img.onload=function(){
-
-let canvas=document.getElementById("canvasOutput");
-let ctx=canvas.getContext("2d");
-
-/* FIX LỖI KHÔNG HIỆN ẢNH */
-
-canvas.width=img.width;
-canvas.height=img.height;
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-ctx.drawImage(img,0,0);
-
-
-/* ĐỢI OPENCV LOAD */
-
-if(typeof cv !== "undefined"){
-
-setTimeout(function(){
-
-detectColonies(canvas);
-
-},200);
-
-}
-
-};
-
-img.src=URL.createObjectURL(file);
-
-});
-
-
-
-function detectColonies(canvas){
-
-let src=cv.imread(canvas);
-
-/* resize ảnh để thuật toán ổn định */
-
-let dsize=new cv.Size(800,src.rows*800/src.cols);
-cv.resize(src,src,dsize,0,0,cv.INTER_AREA);
-
-
-/* chuyển sang HSV */
-
 let hsv=new cv.Mat();
 
-cv.cvtColor(src,hsv,cv.COLOR_RGBA2RGB);
-cv.cvtColor(hsv,hsv,cv.COLOR_RGB2HSV);
+cv.cvtColor(src,hsv,cv.COLOR_RGB2HSV);
 
 
-/* mask ecoli */
+/* TẠO MASK MÀU */
 
 let ecoliMask=new cv.Mat();
-
-cv.inRange(
-hsv,
-new cv.Scalar(85,40,40),
-new cv.Scalar(140,255,255),
-ecoliMask
-);
-
-
-/* mask coliform */
-
 let coliformMask=new cv.Mat();
 
-let r1=new cv.Mat();
-let r2=new cv.Mat();
 
-cv.inRange(hsv,new cv.Scalar(0,40,40),new cv.Scalar(15,255,255),r1);
-cv.inRange(hsv,new cv.Scalar(160,40,40),new cv.Scalar(180,255,255),r2);
+/* MÀU XANH (E.COLI) */
 
-cv.add(r1,r2,coliformMask);
+let lowerBlue=new cv.Mat(hsv.rows,hsv.cols,hsv.type(),[90,50,50,0]);
+let upperBlue=new cv.Mat(hsv.rows,hsv.cols,hsv.type(),[130,255,255,255]);
 
 
-/* morphology */
+/* MÀU ĐỎ (COLIFORM) */
 
-let kernel=cv.getStructuringElement(
-cv.MORPH_ELLIPSE,
-new cv.Size(5,5)
-);
-
-cv.morphologyEx(ecoliMask,ecoliMask,cv.MORPH_OPEN,kernel);
-cv.morphologyEx(coliformMask,coliformMask,cv.MORPH_OPEN,kernel);
+let lowerRed=new cv.Mat(hsv.rows,hsv.cols,hsv.type(),[0,70,50,0]);
+let upperRed=new cv.Mat(hsv.rows,hsv.cols,hsv.type(),[10,255,255,255]);
 
 
-/* hàm đếm */
+cv.inRange(hsv,lowerBlue,upperBlue,ecoliMask);
+cv.inRange(hsv,lowerRed,upperRed,coliformMask);
 
-function count(mask){
 
-let contours=new cv.MatVector();
-let hierarchy=new cv.Mat();
+/* TÌM KHUẨN LẠC */
 
-cv.findContours(
-mask,
-contours,
-hierarchy,
-cv.RETR_EXTERNAL,
-cv.CHAIN_APPROX_SIMPLE
-);
+let ecoliContours=new cv.MatVector();
+let colContours=new cv.MatVector();
 
-let count=0;
+cv.findContours(ecoliMask,ecoliContours,new cv.Mat(),cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
+cv.findContours(coliformMask,colContours,new cv.Mat(),cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
 
-for(let i=0;i<contours.size();i++){
 
-let cnt=contours.get(i);
+let ecoliCount=ecoliContours.size();
+let colCount=colContours.size();
 
-let area=cv.contourArea(cnt);
 
-if(area>10 && area<2000){
-count++;
-}
+/* HIỂN THỊ KẾT QUẢ */
+
+document.getElementById("ecoli").innerText=ecoliCount;
+document.getElementById("coliform").innerText=colCount;
+document.getElementById("total").innerText=ecoliCount+colCount;
 
 }
-
-contours.delete();
-hierarchy.delete();
-
-return count;
-
-}
-
-
-/* đếm */
-
-let ecoli=count(ecoliMask);
-let coliform=count(coliformMask);
-
-
-/* hiển thị */
-
-document.getElementById("ecoli").innerText=ecoli;
-document.getElementById("coliform").innerText=coliform;
-document.getElementById("total").innerText=ecoli+coliform;
-
-
-/* giải phóng */
-
-src.delete();
-hsv.delete();
-ecoliMask.delete();
-coliformMask.delete();
-r1.delete();
-r2.delete();
-kernel.delete();
-
-}
-
 
 </script>
 </body>
